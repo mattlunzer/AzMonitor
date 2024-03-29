@@ -1,0 +1,8 @@
+// Data collected via DCR - Linux - Basic - Performance Counters
+// Reports System Uptime
+Perf
+| where CounterName == "Uptime"
+| summarize MaxSystemUpTime = max(CounterValue) by Computer
+| extend UptimeHours = toint(MaxSystemUpTime / 3600), RemainingMinutes = toint((MaxSystemUpTime % 3600) / 60), RemainingSeconds = toint(MaxSystemUpTime % 60)
+| extend Uptime = strcat(UptimeHours, "h ", RemainingMinutes, "m ", RemainingSeconds, "s")
+| project Computer, Uptime
