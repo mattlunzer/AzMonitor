@@ -2,7 +2,10 @@
 // Reports System Uptime
 Perf
 | where CounterName == "Uptime"
-| summarize MaxSystemUpTime = max(CounterValue) by Computer
-| extend UptimeHours = toint(MaxSystemUpTime / 3600), RemainingMinutes = toint((MaxSystemUpTime % 3600) / 60), RemainingSeconds = toint(MaxSystemUpTime % 60)
+| summarize arg_max(TimeGenerated, *) by Computer
+| extend
+    UptimeHours = toint(CounterValue / 3600),
+    RemainingMinutes = toint((CounterValue % 3600) / 60),
+    RemainingSeconds = toint(CounterValue % 60)
 | extend Uptime = strcat(UptimeHours, "h ", RemainingMinutes, "m ", RemainingSeconds, "s")
-| project Computer, Uptime
+| project Computer, Uptime, LastCheckin = TimeGenerated
